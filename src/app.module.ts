@@ -8,11 +8,11 @@ import { Student } from './Database/student.entity';
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: process.env.HOST,
-      port: parseInt(process.env.PORT),
-      username: process.env.USERNAME,
-      password: process.env.PASSWORD,
-      database: process.env.DATABASE,
+      host: 'localhost',
+      port: 3306,
+      username: 'root',
+      password: '',
+      database: 'test db',
       entities: [Student],
       synchronize: true,
     }),

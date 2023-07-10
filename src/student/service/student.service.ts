@@ -3,7 +3,11 @@ import { createStudentDto, editStudentDto } from '../dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Student } from '../../Database/student.entity';
 import { Repository } from 'typeorm';
-
+import {
+  createstudent,
+  DeleteStudent,
+  GetStudentById,
+} from '../helper/studentqueries';
 @Injectable()
 export class StudentService {
   constructor(
@@ -11,45 +15,28 @@ export class StudentService {
     private studentRepository: Repository<Student>,
   ) {}
   async createStudent(dto: createStudentDto) {
-    try {
-      const student = this.studentRepository.create(dto);
-      const newStudent = await this.studentRepository.save(student);
-      return {
-        message: 'Student is created succesfully',
-        student: newStudent,
-      };
-    } catch (error) {
-      return {
-        error,
-      };
-    }
+    return await createstudent(this.studentRepository, dto);
   }
   async getStudents() {
     try {
       const student = await this.studentRepository.find();
-      return {
-        message: 'List of All Students',
-        student,
-      };
-    } catch (error) {
-      return { error };
-    }
-  }
-  async getStudentById(id: number) {
-    try {
-      const student = await this.studentRepository.findOne({ where: { id } });
-      if (student) {
+      if (student.length < 0) {
+        console.log(student.length)
         return {
-          student,
+          message: 'No Students Available ',
         };
       } else {
         return {
-          error: 'User does not exist',
+          message: 'List of All Students',
+          student,
         };
       }
     } catch (error) {
       return { error };
     }
+  }
+  async getStudentById(id: number) {
+    return await GetStudentById(id, this.studentRepository);
   }
   async editStudent(dto: editStudentDto, id: number) {
     try {
@@ -69,20 +56,6 @@ export class StudentService {
     }
   }
   async deleteStudent(id: number) {
-    try {
-      const student = await this.studentRepository.findOne({ where: { id } });
-      if (student) {
-        await this.studentRepository.delete({ id });
-        return {
-          message: `Student is Deleted Successfully`,
-        };
-      } else {
-        return {
-          error: 'Student does not exist',
-        };
-      }
-    } catch (error) {
-      return { error };
-    }
+    return await DeleteStudent(id, this.studentRepository);
   }
 }
